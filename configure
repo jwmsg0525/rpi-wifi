@@ -92,7 +92,7 @@ EOF
 # Populate `/etc/dnsmasq.conf`
 sudo bash -c 'cat > /etc/dnsmasq.conf' << EOF
 interface=lo,ap0
-no-dhcp-interface=lo,wlan0,eth0
+no-dhcp-interface=lo,wlan0
 bind-interfaces
 server=8.8.8.8
 domain-needed
@@ -144,7 +144,6 @@ source-directory /etc/network/interfaces.d
 auto lo
 auto ap0
 auto wlan0
-auto eth0
 iface lo inet loopback
 
 allow-hotplug ap0
@@ -163,12 +162,10 @@ EOF
 sudo bash -c 'cat > /bin/rpi-wifi.sh' << EOF
 echo 'Starting Wifi AP and client...'
 sleep 30
-sudo ifdown --force eth0
 sudo ifdown --force wlan0
 sudo ifdown --force ap0
 sudo ifup ap0
 sudo ifup wlan0
-sudo ifup eth0
 $([ "${NO_INTERNET-}" != "true" ] && echo "sudo sysctl -w net.ipv4.ip_forward=1")
 $([ "${NO_INTERNET-}" != "true" ] && echo "sudo iptables -t nat -A POSTROUTING -s ${AP_IP_BEGIN}.0/24 ! -d ${AP_IP_BEGIN}.0/24 -j MASQUERADE")
 $([ "${NO_INTERNET-}" != "true" ] && echo "sudo systemctl restart dnsmasq")
